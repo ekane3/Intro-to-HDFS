@@ -1,2 +1,1 @@
-# Into to HDFS
-### Author : Emile EKANE
+# Intro to HDFS
