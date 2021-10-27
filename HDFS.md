@@ -71,29 +71,24 @@ KB, MB or GB (the -h = human units option also exists on Unix).
 ```
 #too large to print the results
 ```
-- hdfs dfs -mkdir /user/emile.ekane-ekane/NewDir : to create a new directory
-```
+- hdfs dfs -mkdir /user/emile.ekane-ekane/NewDir : to create a new directory name NewDir
 
-```
 - hdfs dfs -tail bonjour.txt: display the last KB of the file;
-```
 
-```
 -  Remove this file from HDFS by hdfs dfs -rm bonjour.txt;
 ```
-
+> hdfs dfs -rm bonjour.txt
 ```
 - Put this file again by hdfs dfs -copyFromLocal bonjour.txt (check with hdfs dfs -ls). This command is similar to hdfs dfs -put;
 ```
-
+> hdfs dfs -put bonjour.txt
 ```
 
-- hdfs dfs -chmod go+w bonjour.txt (check its owner, group and rights
-with hdfs dfs -ls);
+- hdfs dfs -chmod go+w bonjour.txt : Give its owner, group the rights to write in the file.To check the rights we type  hdfs dfs -ls
 ```
 
 ```
-- hdfs dfs -chmod go-r bonjour.txt (check the rights);
+- hdfs dfs -chmod go-r bonjour.txt : To check the rights
 ```
 
 ```
