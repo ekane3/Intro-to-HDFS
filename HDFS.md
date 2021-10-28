@@ -20,6 +20,8 @@ The goal of this lab is to learn the concepts and commands in order to properly 
 - Create a new text document called bonjour.txt  
 ```
 cat > bonjour.txt
+#And insert
+Its Emile
 ```
 - List the files with ls, display the bonjour.txt file, edit it with nano or v
 ```
@@ -84,89 +86,175 @@ KB, MB or GB (the -h = human units option also exists on Unix).
 > hdfs dfs -put bonjour.txt
 ```
 
-- hdfs dfs -chmod go+w bonjour.txt : Give its owner, group the rights to write in the file.To check the rights we type  hdfs dfs -ls
+- hdfs dfs -chmod go+w bonjour.txt : Give its owner and group the rights to write in the file.To check the rights we type :
 ```
+hdfs dfs -ls -l
+```
+- hdfs dfs -chmod go-r bonjour.txt : This commands remove the right to read the file by the group or user of the file.
 
+- hdfs dfs -mv bonjour.txt dossier/bonjour.txt : This command change the file location to the /dossier/ directory;
 ```
-- hdfs dfs -chmod go-r bonjour.txt : To check the rights
-```
-
-```
-- hdfs dfs -mv bonjour.txt dossier/bonjour.txt (check with hdfs dfs
--ls -R);
-```
-
+hdfs dfs -ls -R
 ```
 
 - hdfs dfs -get dossier/bonjour.txt demat.txt: transfer the file from
-HDFS to your Linux account by changing its name. This command should
+HDFS to your Linux account by changing its name from bonjour.txt to demat.txt. This command should
 not be done with real big data!
+
+- hdfs dfs -cp dossier/bonjour.txt dossier/salut.txt: This command copy the file bonjour.txt to the file salut.txt. To check type : 
 ```
+hdfs dfs -ls /dossier
+```
+- hdfs dfs -count -h / : display the number of subdirectories, files and bytes occupied in /. This command roughly corresponds to -h in Unix;
+```
+[emile.ekane-ekane@hadoop-edge01 ~]$ hdfs dfs -count -h /user/emile.ekane-ekane
+          13          140             27.9 G /user/emile.ekane-ekane
 
 ```
-- hdfs dfs -cp dossier/bonjour.txt dossier/salut.txt (check);
-```
-
-```
-- hdfs dfs -count -h /: display the number of subdirectories, files and bytes occupied in /. This command roughly corresponds to -h in Unix;
-```
-
-```
+This command outputs the DIR_COUNT FILE_COUNT CONTENT_SIZE PATHNAME .
 - hdfs dfs -rm dossier/bonjour.txt (check with hdfs dfs -ls dossier);
-```
 
-```
 - hdfs dfs -rm -r -skipTrash dossier (check with hdfs dfs -ls);
-```
 
-```
 
 Therefore we understand correctly that there are two file spaces
 - The files and directories of our linux account, visible with ls in the ssh window;
 - HDFS files and directories, visible byt doing hdfs dfs -ls in the ssh window;
 - Delete the local bonjour.txt and demat.txt 
 ```
-
+> rm bonjour.txt demat.txt
 ```
 <br>
 
-For help : [Click here]("https://hadoop.apache.org/docs/current/hadoop-project-dist/hadoop-common/FileSystemShell.html")
+> <br> Documentation for all commands is on this is [here]("https://hadoop.apache.org/docs/current/hadoop-project-dist/hadoop-common/FileSystemShell.html")  
+<br>
+
 
 <br><br>
 
 ### 1.3.3 Uploading a file to HDFS
 - Download the most frequently downloaded e-book (in Plain Text UTF-8)
 from [Project Gutenberg](https://www.gutenberg.org/files/57333/57333-0.txt).  
+We download the file
 ```
+> wget https://www.gutenberg.org/files/57333/57333-0.txt
+
+[emile.ekane-ekane@hadoop-edge01 ~]$ ls
+57333-0.txt    bonjour.txt  message.txt  reducer.py                  sudoku.dta  ulysse.txt
+57333-0.txt.1  mapper.py    outline.txt  secret-of-the-universe.txt  text.txt    vinci.txt
 
 ```
+Let's rename the file to gut.txt
+```
+> mv 57333-0.txt gut.txt
+
+[emile.ekane-ekane@hadoop-edge01 ~]$ ls
+57333-0.txt.1  bonjour.txt  gut.txt  mapper.py  message.txt  outline.txt  reducer.py  secret-of-the-universe.txt  sudoku.dta  text.txt  ulysse.txt  vinci.txt
+
+```
+
 - Create a directory called raw inside your HDFS home directory.
+```
+> hdfs dfs -mkdir /raw
+
+[emile.ekane-ekane@hadoop-edge01 ~]$ hdfs dfs -ls
+Found 13 items
+drwx------   - emile.ekane-ekane emile.ekane-ekane          0 2021-10-25 02:00 .Trash
+drwx------   - emile.ekane-ekane emile.ekane-ekane          0 2021-10-27 10:43 .staging
+drwxr-xr-x   - emile.ekane-ekane emile.ekane-ekane          0 2021-10-18 17:06 NewDir
+drwxr-xr-x   - emile.ekane-ekane emile.ekane-ekane          0 2021-10-24 12:12 data
+drwxr-xr-x   - emile.ekane-ekane emile.ekane-ekane          0 2021-10-24 19:04 gutenberg
+drwxr-xr-x   - emile.ekane-ekane emile.ekane-ekane          0 2021-10-27 08:26 gutenberg-output
+drwxr-xr-x   - emile.ekane-ekane emile.ekane-ekane          0 2021-10-27 10:43 gutenberg-outputs
+-rw-r--r--   3 emile.ekane-ekane emile.ekane-ekane        540 2021-10-24 19:45 mapper.py
+drwxr-xr-x   - emile.ekane-ekane emile.ekane-ekane          0 2021-09-30 14:37 raw
+-rw-r--r--   3 emile.ekane-ekane emile.ekane-ekane       1053 2021-10-24 19:45 reducer.py
+-rw-r--r--   3 emile.ekane-ekane emile.ekane-ekane        162 2021-10-21 14:15 sudoku.dta
+-rw-r--r--   3 emile.ekane-ekane emile.ekane-ekane     798774 2021-10-21 13:41 text.txt
+drwxr-xr-x   - emile.ekane-ekane emile.ekane-ekane          0 2021-10-21 13:49 wordcount
+
+```
 - Put the downloaded e-book inside this directory.
 ```
+> hdfs dfs -put gut.txt /user/emile.ekane-ekane/raw
+
+
+[emile.ekane-ekane@hadoop-edge01 ~]$ hdfs dfs -ls /user/emile.ekane-ekane/raw
+Found 1 items
+-rw-r--r--   3 emile.ekane-ekane emile.ekane-ekane    5426096 2021-10-28 09:23 /user/emile.ekane-ekane/raw/gut.txt
 
 ```
 - Create a copy directly inside your HDFS home directory.
 ```
+> hdfs dfs -cp /user/emile.ekane-ekane/raw/gut.txt /user/emile.ekane-ekane/
+
+[emile.ekane-ekane@hadoop-edge01 ~]$ hdfs dfs -ls /user/emile.ekane-ekane/
+Found 14 items
+drwx------   - emile.ekane-ekane emile.ekane-ekane          0 2021-10-25 02:00 /user/emile.ekane-ekane/.Trash
+drwx------   - emile.ekane-ekane emile.ekane-ekane          0 2021-10-27 10:43 /user/emile.ekane-ekane/.staging
+drwxr-xr-x   - emile.ekane-ekane emile.ekane-ekane          0 2021-10-18 17:06 /user/emile.ekane-ekane/NewDir
+drwxr-xr-x   - emile.ekane-ekane emile.ekane-ekane          0 2021-10-24 12:12 /user/emile.ekane-ekane/data
+-rw-r--r--   3 emile.ekane-ekane emile.ekane-ekane    5426096 2021-10-28 09:36 /user/emile.ekane-ekane/gut.txt
 
 ```
 - Rename the copy inside your HDFS home directory to input.txt.
 ```
+> hdfs dfs -mv /user/emile.ekane-ekane/gut.txt /user/emile.ekane-ekane/input.txt 
+
+[emile.ekane-ekane@hadoop-edge01 ~]$ hdfs dfs -ls /user/emile.ekane-ekane/
+Found 14 items
+drwx------   - emile.ekane-ekane emile.ekane-ekane          0 2021-10-25 02:00 /user/emile.ekane-ekane/.Trash
+drwx------   - emile.ekane-ekane emile.ekane-ekane          0 2021-10-27 10:43 /user/emile.ekane-ekane/.staging
+drwxr-xr-x   - emile.ekane-ekane emile.ekane-ekane          0 2021-10-18 17:06 /user/emile.ekane-ekane/NewDir
+drwxr-xr-x   - emile.ekane-ekane emile.ekane-ekane          0 2021-10-24 12:12 /user/emile.ekane-ekane/data
+drwxr-xr-x   - emile.ekane-ekane emile.ekane-ekane          0 2021-10-24 19:04 /user/emile.ekane-ekane/gutenberg
+drwxr-xr-x   - emile.ekane-ekane emile.ekane-ekane          0 2021-10-27 08:26 /user/emile.ekane-ekane/gutenberg-output
+drwxr-xr-x   - emile.ekane-ekane emile.ekane-ekane          0 2021-10-27 10:43 /user/emile.ekane-ekane/gutenberg-outputs
+-rw-r--r--   3 emile.ekane-ekane emile.ekane-ekane    5426096 2021-10-28 09:36 /user/emile.ekane-ekane/input.txt
 
 ```
 - Read directly from HDFS the input.txt file.
 ```
-
+> hdfs dfs -cat /user/emile.ekane-ekane/input.txt
 ```
 - Remove this file (careful with this command).
 ```
+> hdfs dfs -rm /user/emile.ekane-ekane/input.txt
+
+[emile.ekane-ekane@hadoop-edge01 ~]$ hdfs dfs -rm /user/emile.ekane-ekane/input.txt
+21/10/28 09:49:19 INFO fs.TrashPolicyDefault: Moved: 'hdfs://efrei/user/emile.ekane-ekane/input.txt' to trash at: hdfs://efrei/user/emile.ekane-ekane/.Trash/Current/user/emile.ekane-ekane/input.txt
 
 ```
 - List your HDFS home directory.
 ```
+> hdfs dfs -ls /user/emile.ekane-ekane
+
+
+[emile.ekane-ekane@hadoop-edge01 ~]$ hdfs dfs -ls /user/emile.ekane-ekane/
+Found 13 items
+drwx------   - emile.ekane-ekane emile.ekane-ekane          0 2021-10-28 09:49 /user/emile.ekane-ekane/.Trash
+drwx------   - emile.ekane-ekane emile.ekane-ekane          0 2021-10-27 10:43 /user/emile.ekane-ekane/.staging
+drwxr-xr-x   - emile.ekane-ekane emile.ekane-ekane          0 2021-10-18 17:06 /user/emile.ekane-ekane/NewDir
+drwxr-xr-x   - emile.ekane-ekane emile.ekane-ekane          0 2021-10-24 12:12 /user/emile.ekane-ekane/data
+drwxr-xr-x   - emile.ekane-ekane emile.ekane-ekane          0 2021-10-24 19:04 /user/emile.ekane-ekane/gutenberg
+drwxr-xr-x   - emile.ekane-ekane emile.ekane-ekane          0 2021-10-27 08:26 /user/emile.ekane-ekane/gutenberg-output
+drwxr-xr-x   - emile.ekane-ekane emile.ekane-ekane          0 2021-10-27 10:43 /user/emile.ekane-ekane/gutenberg-outputs
+-rw-r--r--   3 emile.ekane-ekane emile.ekane-ekane        540 2021-10-24 19:45 /user/emile.ekane-ekane/mapper.py
+drwxr-xr-x   - emile.ekane-ekane emile.ekane-ekane          0 2021-10-28 09:23 /user/emile.ekane-ekane/raw
+-rw-r--r--   3 emile.ekane-ekane emile.ekane-ekane       1053 2021-10-24 19:45 /user/emile.ekane-ekane/reducer.py
+-rw-r--r--   3 emile.ekane-ekane emile.ekane-ekane        162 2021-10-21 14:15 /user/emile.ekane-ekane/sudoku.dta
+-rw-r--r--   3 emile.ekane-ekane emile.ekane-ekane     798774 2021-10-21 13:41 /user/emile.ekane-ekane/text.txt
+drwxr-xr-x   - emile.ekane-ekane emile.ekane-ekane          0 2021-10-21 13:49 /user/emile.ekane-ekane/wordcount
 
 ```
 - Retrieve the file from the raw directory from HDFS to the local filesystem
 and rename it local.txt.
 ```
+> hdfs dfs -get /user/emile.ekane-ekane/raw/gut.txt local.txt
+
+[emile.ekane-ekane@hadoop-edge01 ~]$ hdfs dfs -get /user/emile.ekane-ekane/raw/gut.txt local.txt
+[emile.ekane-ekane@hadoop-edge01 ~]$ ls
+57333-0.txt.1  gut.txt    mapper.py    outline.txt  secret-of-the-universe.txt  text.txt    vinci.txt
+bonjour.txt    local.txt  message.txt  reducer.py   sudoku.dta                  ulysse.txt
 
 ```
