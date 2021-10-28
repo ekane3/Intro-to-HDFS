@@ -126,7 +126,7 @@ Therefore we understand correctly that there are two file spaces
 ```
 <br>
 
-> <br> Documentation for all commands is on this is [here]("https://hadoop.apache.org/docs/current/hadoop-project-dist/hadoop-common/FileSystemShell.html")  
+> Documentation for all commands is on this is [here]("https://hadoop.apache.org/docs/current/hadoop-project-dist/hadoop-common/FileSystemShell.html")  
 <br>
 
 
